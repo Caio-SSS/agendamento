@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agenda Manicure</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="home">
+    <div class="container">
+        <img src="{{ url_for('static', filename='logo.png') }}" alt="Logo da Manicure" class="logo">
+        <h1>BEM-VINDA AO</h1>
+        <h2>MICHELE NAIL</h2>
+        <p>Beleza, cuidado e pontualizade no seu atendimento 💅</p>
+
+        <a href="/agendar" class="btn agendar"><i>📅</i> FAZER AGENDAMENTO</a>
+        <a href="/admin" class="btn admin"><i>👤</i>ÁREA ADMINISTRATIVA</a>
+    </div>
+    
+
+</body>
+</html>

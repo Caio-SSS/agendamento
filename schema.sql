@@ -1,0 +1,16 @@
+DROP TABLE IF EXISTS agendamentos;
+
+CREATE TABLE agendamentos (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    nome TEXT NOT NULL,
+    horario TEXT NOT NULL,
+    servico TEXT NOT NULL
+);
+
+DROP TABLE IF EXISTS users;
+
+CREATE TABLE users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    username TEXT UNIQUE NOT NULL,
+    password TEXT NOT NULL
+);

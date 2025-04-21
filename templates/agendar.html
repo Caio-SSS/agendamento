@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agendar horário</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        .step {
+            display: none;
+        }
+
+        .step.active {
+            display: block;
+        }
+
+        .progress-bar {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+
+        .progress-step {
+            width: 30%;
+            padding: 10px;
+            border-bottom: 4px solid gray;
+            text-align: center;
+            color: gray;
+        }
+
+        .progress-step.active {
+            color: black;
+            border-color: #d4aa7d;
+            font-weight: bold;
+        }
+
+        .btn-group {
+            margin-top: 30px;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-form {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            background-color: #d4aa7d;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+        }
+
+        .btn-form:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .formulario input {
+            margin-bottom: 15px;
+            padding: 10px;
+            width: calc(100% - 22px);
+            /* Considerar o padding */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            /* Para que padding não aumente a largura */
+
+        }
+    </style>
+</head>
+
+<body class="formulario">
+    <div class="container">
+        <h1>Agendamento</h1>
+
+        <div class="progress-bar">
+            <div class="progress-step step-1 active">1. Seus Dados</div>
+            <div class="progress-step step-2">2. Agendamento</div>
+            <div class="progress-step step-3">3. Confirmação</div>
+        </div>
+
+        <div class="step step-1 active">
+            <h2>Seus Dados</h2>
+            <input type="text" id="nome" placeholder="Nome completo" required><br>
+            <input type="email" id="email" placeholder="E-mail válido" required><br>
+            <input type="tel" id="telefone" placeholder="Telefone (com DDD)" required><br>
+            <div class="btn-group">
+                <a href="/" class="btn-form">Voltar</a>
+                <button class="btn-form" onclick="proximaEtapa(1)">Continuar</button>
+            </div>
+        </div>
+
+        <div class="step step-2">
+            <h2>Agendamento</h2>
+            <p>Selecione a data, o serviço e o horário desejado.</p>
+            <div class="data-selecao">
+                <h3>Data</h3>
+                <p>Hoje: <span id="data-atual"></span></p>
+            </div>
+            <div class="servicos-disponiveis">
+                <h3>Serviços</h3>
+                <div class="servicos-grid">
+                    <div class="servico-card">
+                        <h4>Manicure Tradicional</h4>
+                        <div class="servico-info">
+                            <p class="descricao">Cuidado básico das unhas.</p>
+                            <p class="duracao">Duração: 30 minutos</p>
+                            <p class="valor">Valor: R$ 60,00</p>
+                        </div>
+                        <button class="btn-selecionar-servico" data-nome="Manicure Tradicional">Selecionar</button>
+                    </div>
+                    <div class="servico-card">
+                        <h4>Pedicure Tradicional</h4>
+                        <div class="servico-info">
+                            <p class="descricao">Cuidado básico dos pés.</p>
+                            <p class="duracao">Duração: 40 minutos</p>
+                            <p class="valor">Valor: R$ 70,00</p>
+                        </div>
+                        <button class="btn-selecionar-servico" data-nome="Pedicure Tradicional">Selecionar</button>
+                    </div>
+                </div>
+            </div>
+            <div class="horarios-disponiveis" id="horarios-container" style="display: none;">
+                <h3>Horários Disponíveis</h3>
+                <div class="periodo-container">
+                    <h4>Manhã</h4>
+                    <div class="horarios-manha">
+                        <button type="button" class="btn-horario" value="09:00">09:00</button>
+                        <button type="button" class="btn-horario" value="09:30">09:30</button>
+                        <button type="button" class="btn-horario" value="10:00">10:00</button>
+                        <button type="button" class="btn-horario" value="10:30">10:30</button>
+                        <button type="button" class="btn-horario" value="11:00">11:00</button>
+                        <button type="button" class="btn-horario" value="11:30">11:30</button>
+                    </div>
+                </div>
+                <div class="periodo-container">
+                    <h4>Tarde</h4>
+                    <div class="horarios-tarde">
+                        <button type="button" class="btn-horario" value="12:00">12:00</button>
+                        <button type="button" class="btn-horario" value="12:30">12:30</button>
+                        <button type="button" class="btn-horario" value="13:00">13:00</button>
+                        <button type="button" class="btn-horario" value="13:30">13:30</button>
+                        <button type="button" class="btn-horario" value="14:00">14:00</button>
+                        <button type="button" class="btn-horario" value="14:30">14:30</button>
+                        <button type="button" class="btn-horario" value="15:00">15:00</button>
+                        <button type="button" class="btn-horario" value="15:30">15:30</button>
+                        <button type="button" class="btn-horario" value="16:00">16:00</button>
+                        <button type="button" class="btn-horario" value="16:30">16:30</button>
+                        <button type="button" class="btn-horario" value="17:00">17:00</button>
+                        <button type="button" class="btn-horario" value="17:30">17:30</button>
+                    </div>
+                </div>
+                <div class="periodo-container">
+                    <h4>Noite</h4>
+                    <div class="horarios-noite">
+                        <button type="button" class="btn-horario" value="18:00">18:00</button>
+                        <button type="button" class="btn-horario" value="18:30">18:30</button>
+                        <button type="button" class="btn-horario" value="19:00">19:00</button>
+                        <button type="button" class="btn-horario" value="19:30">19:30</button>
+                        <button type="button" class="btn-horario" value="20:00">20:00</button>
+                        <button type="button" class="btn-horario" value="20:30">20:30</button>
+                    </div>
+                </div>
+                <div class="horario-funcionamento">
+                    <p><strong>Horário de funcionamento:</strong> Segunda a Sábado. Segunda e quarta das 09:00 às 20:00
+                </div>
+            </div>
+            <div class="btn-group">
+                <button class="btn-form" onclick="etapaAnterior(2)">Voltar</button>
+                <button class="btn-form" onclick="proximaEtapa(2)">Continuar</button>
+            </div>
+        </div>
+
+        <div class="step step-3">
+            <h2>Pagamento</h2>
+            <p>Para garantir o seu agendamento, realize um pré-pagamento simbólico de <strong>R$ 10,00</strong> via PIX. Este valor será abatido do total do serviço no dia do seu atendimento.</p>
+        
+            <div class="informacao-servico">
+                <p>Serviço Selecionado: <span id="servico-confirmacao"></span></p>
+                <p>Horário Agendado: <span id="horario-confirmacao"></span></p>
+                </div>
+        
+            <p>Valor total do serviço a ser pago no dia: <strong id="valor-total-servico">R$ [Valor Total]</strong> (R$ 10,00 agora + R$ [Valor Total - 10,00] no dia).</p>
+        
+            <div class="qrcode-container">
+                <p>Escaneie o QR Code abaixo para pagar <strong>R$ 10,00</strong> via PIX:</p>
+                <img src="{{ url_for('static', filename='qrcode_10_reais.png') }}" alt="QR Code PIX - R$ 10,00">
+            </div>
+        
+            <div class="aviso-nao-reembolso">
+                <p><strong>Importante:</strong> Em caso de não comparecimento na data e horário agendados, o valor de R$ 10,00 pago para garantir a reserva não será reembolsado.</p>
+            </div>
+        
+            <div class="btn-group">
+                <button class="btn-form" onclick="etapaAnterior(3)">Voltar</button>
+                <button class="btn-form" onclick="confirmarAgendamento()">Confirmar Agendamento</button>
+            </div>
+        </div>
+        
+        <style>
+            /* ... seus estilos existentes ... */
+            .informacao-servico, .aviso-nao-reembolso {
+                margin-bottom: 20px;
+                text-align: left;
+            }
+        
+            .aviso-nao-reembolso strong {
+                color: red; /* Destacar a informação importante */
+            }
+        </style>
+        
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const servicoConfirmacao = document.getElementById('servico-confirmacao');
+                const horarioConfirmacao = document.getElementById('horario-confirmacao');
+                const valorTotalServico = document.getElementById('valor-total-servico');
+                const botaoSelecionarServico = document.querySelector('.btn-selecionar-servico.selecionado');
+                const botaoHorarioSelecionado = document.querySelector('.btn-horario.selecionado');
+        
+                if (botaoSelecionarServico && servicoConfirmacao) {
+                    servicoConfirmacao.textContent = botaoSelecionarServico.dataset.nome;
+                    // Aqui você precisará buscar o valor total do serviço selecionado
+                    // e atualizar o valorTotalServico.textContent
+                    valorTotalServico.textContent = `R$ [Valor Total do ${botaoSelecionarServico.dataset.nome}]`;
+                }
+        
+                if (botaoHorarioSelecionado && horarioConfirmacao) {
+                    horarioConfirmacao.textContent = botaoHorarioSelecionado.value;
+                }
+            });
+        
+            window.confirmarAgendamento = function() {
+                const nome = document.getElementById('nome').value;
+                const email = document.getElementById('email').value;
+                const telefone = document.getElementById('telefone').value;
+                const botaoServicoSelecionado = document.querySelector('.btn-selecionar-servico.selecionado');
+                const servico = botaoServicoSelecionado ? botaoSelecionarServico.dataset.nome : null;
+                const botaoHorarioSelecionado = document.querySelector('.btn-horario.selecionado');
+                const horario = botaoHorarioSelecionado ? botaoHorarioSelecionado.value : null;
+        
+                if (nome && email && telefone && servico && horario) {
+                    const agendamentoData = {
+                        nome: nome,
+                        email: email,
+                        telefone: telefone,
+                        servico: servico,
+                        horario: horario,
+                        valor_pago: 10.00, // Registrando o valor do pré-pagamento
+                        status_pagamento: 'pendente' // Inicialmente pendente
+                    };
+                    console.log("Dados do agendamento para enviar:", agendamentoData);
+                    alert("Agendamento realizado com sucesso! Aguarde a confirmação.");
+                    // Aqui você fará a chamada para o seu servidor (via Fetch ou similar)
+                    // para salvar os dados do agendamento no banco de dados.
+                } else {
+                    alert("Por favor, preencha todas as etapas do agendamento.");
+                }
+            };
+        </script>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const dataAtualElement = document.getElementById('data-atual');
+            const horariosContainer = document.getElementById('horarios-container');
+            const botoesSelecionarServico = document.querySelectorAll('.btn-selecionar-servico');
+            const botoesHorario = document.querySelectorAll('.btn-horario');
+            const servicoConfirmacao = document.getElementById('servico-confirmacao');
+            const horarioConfirmacao = document.getElementById('horario-confirmacao');
+            const valorTotalServico = document.getElementById('valor-total-servico');
+            let servicoSelecionado = null; // Variável global para o serviço
+            let horarioSelecionado = null; // Variável global para o horário
+            const valoresServicos = { // Objeto para armazenar os valores dos serviços
+                'Manicure Tradicional': 60.00,
+                'Pedicure Tradicional': 70.00
+                // Adicione outros serviços e seus valores aqui
+            };
+    
+            if (dataAtualElement) {
+                dataAtualElement.textContent = new Date().toLocaleDateString();
+            }
+    
+            if (horariosContainer) {
+                horariosContainer.style.display = 'none';
+            }
+    
+            botoesSelecionarServico.forEach(botao => {
+                botao.addEventListener('click', function () {
+                    botoesSelecionarServico.forEach(b => b.classList.remove('selecionado'));
+                    this.classList.add('selecionado');
+                    servicoSelecionado = this.dataset.nome; // Atualiza a variável global
+                    console.log('Serviço selecionado:', servicoSelecionado);
+                    if (horariosContainer) {
+                        horariosContainer.style.display = 'block';
+                    }
+                    // Desseleciona qualquer horário previamente selecionado ao mudar o serviço
+                    botoesHorario.forEach(btn => btn.classList.remove('selecionado'));
+                    horarioSelecionado = null;
+                });
+            });
+    
+            botoesHorario.forEach(botaoHorario => {
+                botaoHorario.addEventListener('click', function () {
+                    botoesHorario.forEach(btn => btn.classList.remove('selecionado'));
+                    this.classList.add('selecionado');
+                    horarioSelecionado = this.value; // Atualiza a variável global
+                    console.log('Horário selecionado:', horarioSelecionado);
+                });
+            });
+    
+            const steps = document.querySelectorAll(".step");
+            const progressSteps = document.querySelectorAll(".progress-step");
+            let currentStep = 1;
+    
+            steps.forEach((step, index) => {
+                step.classList.toggle("active", index === 0);
+            });
+            progressSteps.forEach((step, index) => {
+                step.classList.toggle("active", index === 0);
+            });
+    
+            window.proximaEtapa = function (etapaAtual) {
+                const nome = document.getElementById('nome').value.trim();
+                const email = document.getElementById('email').value.trim();
+                const telefone = document.getElementById('telefone').value.trim();
+                const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    
+                if (etapaAtual === 1 && (!nome || !email || !telefone || !emailValido)) {
+                    alert("Por favor, preencha todos os campos corretamente.");
+                    return;
+                }
+    
+                if (etapaAtual === 2 && !servicoSelecionado) {
+                    alert("Por favor, selecione um serviço antes de continuar.");
+                    return;
+                }
+    
+                steps[etapaAtual - 1].classList.remove("active");
+                progressSteps[etapaAtual - 1].classList.remove("active");
+    
+                currentStep++;
+                if (currentStep > steps.length) {
+                    currentStep = steps.length;
+                }
+    
+                steps[currentStep - 1].classList.add("active");
+                progressSteps[currentStep - 1].classList.add("active");
+    
+                // Atualiza as informações na etapa 3 ao exibir
+                if (currentStep === 3) {
+                    if (servicoConfirmacao) {
+                        servicoConfirmacao.textContent = servicoSelecionado || 'Não selecionado';
+                        if (servicoSelecionado && valoresServicos[servicoSelecionado]) {
+                            valorTotalServico.textContent = `R$ ${valoresServicos[servicoSelecionado].toFixed(2)}`;
+                        } else {
+                            valorTotalServico.textContent = 'R$ --';
+                        }
+                    }
+                    if (horarioConfirmacao) {
+                        horarioConfirmacao.textContent = horarioSelecionado || 'Não selecionado';
+                    }
+                }
+            };
+    
+            window.etapaAnterior = function (etapaAtual) {
+                const horariosContainer = document.getElementById('horarios-container');
+    
+                steps[etapaAtual - 1].classList.remove("active");
+                progressSteps[etapaAtual - 1].classList.remove("active");
+    
+                currentStep--;
+                if (currentStep < 1) {
+                    currentStep = 1;
+                }
+    
+                steps[currentStep - 1].classList.add("active");
+                progressSteps[currentStep - 1].classList.add("active");
+    
+                if (currentStep === 2 && horariosContainer) {
+                    horariosContainer.style.display = 'none';
+                }
+            };
+    
+            window.enviarAgendamento = function () {
+                const nome = document.getElementById('nome').value;
+                const email = document.getElementById('email').value;
+                const telefone = document.getElementById('telefone').value;
+    
+                if (nome && email && telefone && servicoSelecionado && horarioSelecionado) {
+                    const agendamentoData = {
+                        nome: nome,
+                        email: email,
+                        telefone: telefone,
+                        servico: servicoSelecionado,
+                        horario: horarioSelecionado,
+                        valor_pago: 10.00,
+                        status_pagamento: 'pendente'
+                    };
+                    console.log("Dados do agendamento para enviar:", agendamentoData);
+                    alert("Agendamento realizado com sucesso! Aguarde a confirmação.");
+                    // Aqui você fará a chamada para o seu servidor (via Fetch ou similar)
+                } else {
+                    alert("Por favor, preencha todas as etapas do agendamento.");
+                }
+            };
+        });
+    </script>
+
+
+</body>
+
+</html>

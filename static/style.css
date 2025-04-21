@@ -1,0 +1,270 @@
+body.home {
+    background-color: #F2F2F2; /* Novo fundo: Branco/Off-white */
+    color: #333; /* Nova cor texto principal: Preto/Cinza escuro */
+    font-family: 'Segoa UI', sans-serif;
+    text-align: center;
+    padding: 50px 20px;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+}
+
+.logo {
+    width: 200px;
+    margin-bottom: 30px;
+}
+
+body.home h1 {
+    font-size: 30px;
+    margin-top: 0;
+    font-weight: bold;
+    letter-spacing: 1px;
+    color: #A08DA6; /* Nova cor título: Cinza médio */
+}
+
+body.home p {
+    margin: 20px 0 40px;
+    color: #555; /* Nova cor parágrafo: Cinza */
+}
+
+.btn {
+    display: block;
+    padding: 15px;
+    margin: 10px auto;
+    width: 80%;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s;
+}
+
+.btn.agendar {
+    background-color: #9F88BF; /* Nova cor botão Agendar: Lilás */
+    color: #FFFFFF; /* Nova cor texto Agendar: Branco */
+}
+
+.btn.admin {
+    border: 1px solid #9F88BF; /* Nova cor borda Admin: Lilás */
+    background-color: transparent;
+    color: #9F88BF; /* Nova cor texto Admin: Lilás */
+}
+
+.btn:hover {
+    transform: scale(1.03);
+    opacity: 0.9;
+}
+
+/* ... restante do seu CSS (body.formulario, body.lista, etc.) ... */
+
+body.formulario {
+    background-color: #F2F2F2; /* Novo fundo: Branco/Off-white */
+    color: #333;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+}
+
+body.formulario .container h1,
+body.formulario .container h2,
+body.formulario .container h3,
+body.formulario .container h4 {
+    color: #A08DA6; /* Novo título: Cinza médio */
+}
+
+body.formulario .container .progress-bar .progress-step {
+    border-bottom-color: #A08DA6; /* Nova cor barra progresso: Cinza médio */
+    color: #A08DA6; /* Nova cor texto progresso: Cinza médio */
+}
+
+body.formulario .container .progress-bar .progress-step.active {
+    color: #9F88BF; /* Nova cor progresso ativo: Lilás */
+    border-color: #9F88BF; /* Nova cor barra ativa: Lilás */
+}
+
+body.formulario .container .btn-group .btn-form {
+    background-color: #9F88BF; /* Nova cor botão: Lilás */
+    color: #FFFFFF; /* Cor texto botão: Branco */
+}
+
+body.formulario .container .btn-group .btn-form:hover {
+    background-color: #A08DA6; /* Nova cor hover botão: Cinza médio */
+}
+
+body.formulario .container input[type="text"],
+body.formulario .container input[type="email"],
+body.formulario .container input[type="tel"] {
+    border-color: #ccc; /* Manter cor borda input */
+}
+
+/* Estilos para a seção de horários */
+body.formulario .container .horarios-disponiveis {
+    margin-top: 20px;
+    text-align: left; /* Alinhar o conteúdo à esquerda */
+}
+
+body.formulario .container .horarios-disponiveis h3 {
+    margin-bottom: 15px;
+}
+
+body.formulario .container .periodo-container {
+    margin-bottom: 20px;
+}
+
+body.formulario .container .periodo-container h4 {
+    color: #A08DA6; /* Cor do título do período */
+    margin-top: 0;
+    margin-bottom: 10px;
+}
+
+body.formulario .container .horarios-manha,
+body.formulario .container .horarios-tarde,
+body.formulario .container .horarios-noite {
+    display: flex;
+    flex-wrap: wrap; /* Quebrar os botões para a próxima linha em telas menores */
+    gap: 10px; /* Espaçamento entre os botões de horário */
+}
+
+body.formulario .container .btn-horario {
+    background-color: #f8f9fa; /* Cor de fundo dos botões de horário */
+    color: #333; /* Cor do texto dos botões de horário */
+    border: 1px solid #ced4da; /* Borda dos botões de horário */
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color 0.3s ease;
+}
+
+body.formulario .container .btn-horario:hover {
+    background-color: #e9ecef; /* Cor de fundo no hover */
+}
+
+body.formulario .container .btn-horario.selecionado {
+    background-color: #9F88BF; /* Cor de fundo do botão selecionado */
+    color: #FFFFFF; /* Cor do texto do botão selecionado */
+    border-color: #9F88BF;
+}
+
+body.formulario .container .horario-funcionamento {
+    margin-top: 20px;
+    color: #777;
+    font-size: 0.9em;
+}
+
+body.formulario .container .horario-funcionamento strong {
+    color: #9F88BF;
+}
+
+body.lista {
+    background-color: #f4f4f9;
+    color: #333;
+    font-family: Arial, sans-serif;
+    text-align: center;
+    padding: 40px;
+}
+
+body.lista input[type="submit"] {
+    background-color: #d63384;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+/* Estilos para a grade de serviços */
+body.formulario .container .servicos-disponiveis {
+    margin-bottom: 20px; /* Espaçamento abaixo da seção de serviços */
+}
+
+body.formulario .container .servicos-disponiveis h3 {
+    text-align: left; /* Alinhar o título dos serviços à esquerda */
+    margin-bottom: 15px;
+}
+
+body.formulario .container .servicos-grid {
+    display: grid; /* Usar Grid Layout para organizar os cards */
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Criar colunas responsivas com largura mínima de 200px */
+    gap: 15px; /* Espaçamento entre os cards */
+}
+
+/* Estilos para cada card de serviço */
+body.formulario .container .servico-card {
+    background-color: #FFFFFF; /* Fundo branco para os cards */
+    border: 1px solid #F2BDE0; /* Borda rosa clara */
+    border-radius: 8px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Espaçar o conteúdo verticalmente */
+}
+
+body.formulario .container .servico-card h4 {
+    color: #9F88BF; /* Título do serviço em lilás */
+    margin-top: 0;
+    margin-bottom: 10px;
+    text-align: left;
+    font-size: 1.2em;
+}
+
+body.formulario .container .servico-card .servico-info {
+    margin-bottom: 10px;
+    text-align: left;
+}
+
+body.formulario .container .servico-card .servico-info p {
+    color: #555;
+    margin-bottom: 5px;
+    font-size: 0.9em;
+}
+
+body.formulario .container .servico-card .btn-selecionar-servico {
+    background-color: #F2A7D8; /* Botão selecionar rosa claro */
+    color: #FFFFFF;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+    font-size: 0.9em;
+    text-align: center;
+}
+
+body.formulario .container .btn-selecionar-servico:hover {
+    background-color: #F2BDE0; /* Hover rosa claro mais escuro */
+}
+
+body.formulario .container .btn-selecionar-servico.selecionado {
+    background-color: #A08DA6; /* Selecionado em cinza médio */
+}
+
+@media (max-width: 768px) {
+    .progress-bar {
+        flex-direction: column;
+    }
+    .progress-step {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+    .btn-group {
+        flex-direction: column;
+        align-items: center;
+    }
+    .btn-form {
+        width: 100%;
+        margin: 5px 0;
+    }
+}
+
+.step {
+    display: none;
+    transition: opacity 0.3s ease;
+}
+
+.step.active {
+    display: block;
+    opacity: 1;
+}
