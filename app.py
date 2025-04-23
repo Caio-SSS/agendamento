@@ -25,15 +25,19 @@ import os
 # Inicialização do Flask
 app = Flask(__name__)
 
-# Usar variável de ambiente para a chave secreta 
+# Usar variável de ambiente para a chave secreta
 # Em produção, use uma chave forte e guarde em variável de ambiente
-app.config["SECRET_KEY"] = os.environ.get("SECRET_KEY", "chave_temporaria_para_desenvolvimento")
+app.config["SECRET_KEY"] = os.environ.get(
+    "SECRET_KEY", "chave_temporaria_para_desenvolvimento"
+)
+
 
 # Função para conectar ao banco de dados
 def get_db_connection():
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
     return conn
+
 
 DATABASE = "agendamentos.db"  # Nome do arquivo do banco de dados SQLite
 
@@ -43,29 +47,35 @@ login_manager.login_view = "login"  # Define a rota para a página de login
 
 
 class User(UserMixin):
-    def __init__(self, id, username, password, role='user'):
+    def __init__(self, id, username, password, role="user"):
         self.id = id
         self.username = username
         self.password = password
         self.role = role  # Adicionando um campo de role para controle de acesso
-    
+
     def is_admin(self):
-        return self.role == 'admin'
+        return self.role == "admin"
 
 
 @login_manager.user_loader
 def load_user(user_id):
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT id, username, password, role FROM users WHERE id = ?", (user_id,))
+    cursor.execute(
+        "SELECT id, username, password, role FROM users WHERE id = ?", (user_id,)
+    )
     user_data = cursor.fetchone()
-    if user_data:
-        return User(
-            user_data["id"], 
-            user_data["username"], 
-            user_data["password"],
-            user_data.get("role", "user")  # Definir "user" como padrão 
+
+    if user_data and check_password_hash(
+        user_data[2], user_data[2]
+    ):  # Corrigido para usar a senha correta
+        user = User(
+            user_data[0],  # id
+            user_data[1],  # username
+            user_data[2],  # password
+            user_data[3] if len(user_data) > 3 else "user",  # role
         )
+        return user  # Retornar o usuário
     return None
 
 
@@ -154,43 +164,57 @@ def agendar():
     # Obter serviços disponíveis do banco de dados
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT id, nome, descricao, duracao, preco FROM servico WHERE disponivel = 1")
-    servico = cursor.fetchall()
-    
+    cursor.execute(
+        "SELECT id, nome, descricao, duracao, preco FROM servicos WHERE disponivel = 1"
+    )
+    admin_servicos = cursor.fetchall()
+
     if request.method == "POST":
         # Validação básica dos dados de entrada
         nome = request.form.get("nome", "").strip()
         horario = request.form.get("horario", "").strip()
-        servico = request.form.get("servico", "").strip()
-        
+        servicos = request.form.get("servico", "").strip()
+
         # Validação dos campos
-        if not nome or not horario or not servico:
-            return render_template("agendar.html", error="Todos os campos são obrigatórios.", servicos=servicos)
-        
+        if not nome or not horario or not servicos:
+            return render_template(
+                "agendar.html",
+                error="Todos os campos são obrigatórios.",
+                servicos=admin_servicos,
+            )
+
         try:
             # Validação do formato de data/hora
             horario_dt = datetime.strptime(horario, "%Y-%m-%dT%H:%M")
-            
+
             # Verifica se o horário não está no passado
             if horario_dt < datetime.now():
-                return render_template("agendar.html", 
-                                     error="Não é possível agendar para uma data no passado.",
-                                     servicos=servicos)
-                
+                return render_template(
+                    "agendar.html",
+                    error="Não é possível agendar para uma data no passado.",
+                    servicos=admin_servicos,
+                )
+
             # Armazenar em formato ISO para facilitar ordenação no banco
             horario_iso = horario_dt.isoformat()
-            
+
             cursor.execute(
-                "INSERT INTO agendamentos (nome, horario, servico) VALUES (?, ?, ?)",
-                (nome, horario_iso, servico),
+                "INSERT INTO agendamentos (nome, horario, servicos) VALUES (?, ?, ?)",
+                (nome, horario_iso, servicos),
             )
             db.commit()
-            
-            return redirect(url_for("home", success="Agendamento realizado com sucesso!"))
+
+            return redirect(
+                url_for("home", success="Agendamento realizado com sucesso!")
+            )
         except ValueError:
-            return render_template("agendar.html", error="Formato de data/hora inválido.", servicos=servicos)
-        
-    return render_template("agendar.html", servicos=servicos)
+            return render_template(
+                "agendar.html",
+                error="Formato de data/hora inválido.",
+                servicos=admin_servicos,
+            )
+
+    return render_template("agendar.html", servicos=admin_servicos)
 
 
 @app.route("/admin")
@@ -200,16 +224,16 @@ def admin():
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     db = get_db()
     cursor = db.cursor()
-    
+
     # Buscar os agendamentos
     cursor.execute(
         "SELECT id, nome, horario, servico FROM agendamentos ORDER BY horario DESC"
     )
     agendamentos_db = cursor.fetchall()
-    
+
     # Formatar a data para exibição
     agendamentos = []
     for agendamento in agendamentos_db:
@@ -219,61 +243,60 @@ def admin():
         except (ValueError, TypeError):
             # Caso o formato não seja o esperado, mantém o original
             horario_formatado = agendamento["horario"]
-            
-        agendamentos.append({
-            "id": agendamento["id"],
-            "nome": agendamento["nome"],
-            "horario": horario_formatado,
-            "servico": agendamento["servico"]
-        })
-    
+
+        agendamentos.append(
+            {
+                "id": agendamento["id"],
+                "nome": agendamento["nome"],
+                "horario": horario_formatado,
+                "servico": agendamento["servico"],
+            }
+        )
+
     # Buscar os serviços
-    cursor.execute("SELECT id, nome, descricao, duracao, preco, disponivel FROM servicos")
+    cursor.execute(
+        "SELECT id, nome, descricao, duracao, preco, disponivel FROM servicos"
+    )
     servicos = cursor.fetchall()
-        
+
     return render_template("admin.html", agendamentos=agendamentos, servicos=servicos)
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        if current_user.is_admin():
-            return redirect(url_for("admin"))
-        return redirect(url_for("home"))
+        return redirect(url_for("admin" if current_user.is_admin() else "home"))
 
     if request.method == "POST":
         username = request.form.get("username", "").strip()
         password = request.form.get("password", "")
-        
-        # Validação básica
+
         if not username or not password:
             return render_template("login.html", error="Preencha todos os campos.")
-            
+
         db = get_db()
         cursor = db.cursor()
         cursor.execute(
-            "SELECT id, username, password, role FROM users WHERE username = ?", (username,)
+            "SELECT id, username, password, role FROM users WHERE username = ?",
+            (username,),
         )
         user_data = cursor.fetchone()
 
-        if user_data and check_password_hash(user_data["password"], password):
+        if user_data and check_password_hash(user_data[2], password):
             user = User(
-                user_data["id"], 
-                user_data["username"], 
-                user_data["password"],
-                user_data.get("role", "user")
+                user_data[0],
+                user_data[1],
+                user_data[2],
+                user_data[3] if len(user_data) > 3 else "user",
             )
             login_user(user)
             next_page = request.args.get("next")
-            
-            # Redireciona com base no papel do usuário
-            if user.is_admin() and not next_page:
-                return redirect(url_for("admin"))
-            return redirect(next_page or url_for("home"))
+            return redirect(next_page or url_for("admin"))
         else:
             return render_template(
                 "login.html", error="Nome de usuário ou senha incorretos."
             )
+
     return render_template("login.html")
 
 
@@ -297,12 +320,14 @@ def admin_servicos():
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     db = get_db()
     cursor = db.cursor()
-    cursor.execute("SELECT id, nome, descricao, duracao, preco, disponivel FROM servicos ORDER BY nome")
+    cursor.execute(
+        "SELECT id, nome, descricao, duracao, preco, disponivel FROM servicos ORDER BY nome"
+    )
     servicos = cursor.fetchall()
-    
+
     return render_template("admin_servicos.html", servicos=servicos)
 
 
@@ -312,37 +337,40 @@ def novo_servico():
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
         descricao = request.form.get("descricao", "").strip()
         duracao = request.form.get("duracao", "").strip()
         preco = request.form.get("preco", "").strip()
         disponivel = 1 if request.form.get("disponivel") else 0
-        
+
         # Validação básica
         if not nome or not duracao or not preco:
             flash("Nome, duração e preço são campos obrigatórios.", "error")
             return render_template("novo_servico.html")
-            
+
         try:
             duracao = int(duracao)
             preco = float(preco)
-            
+
             db = get_db()
             cursor = db.cursor()
             cursor.execute(
                 "INSERT INTO servicos (nome, descricao, duracao, preco, disponivel) VALUES (?, ?, ?, ?, ?)",
-                (nome, descricao, duracao, preco, disponivel)
+                (nome, descricao, duracao, preco, disponivel),
             )
             db.commit()
-            
+
             flash("Serviço adicionado com sucesso!", "success")
             return redirect(url_for("admin_servicos"))
         except ValueError:
-            flash("Duração deve ser um número inteiro e preço deve ser um valor decimal.", "error")
+            flash(
+                "Duração deve ser um número inteiro e preço deve ser um valor decimal.",
+                "error",
+            )
             return render_template("novo_servico.html")
-            
+
     return render_template("novo_servico.html")
 
 
@@ -352,50 +380,53 @@ def editar_servico(id):
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     db = get_db()
     cursor = db.cursor()
-    
+
     if request.method == "POST":
         nome = request.form.get("nome", "").strip()
         descricao = request.form.get("descricao", "").strip()
         duracao = request.form.get("duracao", "").strip()
         preco = request.form.get("preco", "").strip()
         disponivel = 1 if request.form.get("disponivel") else 0
-        
+
         # Validação básica
         if not nome or not duracao or not preco:
             flash("Nome, duração e preço são campos obrigatórios.", "error")
             cursor.execute("SELECT * FROM servicos WHERE id = ?", (id,))
             servico = cursor.fetchone()
             return render_template("editar_servico.html", servico=servico)
-            
+
         try:
             duracao = int(duracao)
             preco = float(preco)
-            
+
             cursor.execute(
                 "UPDATE servicos SET nome = ?, descricao = ?, duracao = ?, preco = ?, disponivel = ? WHERE id = ?",
-                (nome, descricao, duracao, preco, disponivel, id)
+                (nome, descricao, duracao, preco, disponivel, id),
             )
             db.commit()
-            
+
             flash("Serviço atualizado com sucesso!", "success")
             return redirect(url_for("admin_servicos"))
         except ValueError:
-            flash("Duração deve ser um número inteiro e preço deve ser um valor decimal.", "error")
+            flash(
+                "Duração deve ser um número inteiro e preço deve ser um valor decimal.",
+                "error",
+            )
             cursor.execute("SELECT * FROM servicos WHERE id = ?", (id,))
             servico = cursor.fetchone()
             return render_template("editar_servico.html", servico=servico)
-    
+
     # GET - Carregar dados do serviço para edição
     cursor.execute("SELECT * FROM servicos WHERE id = ?", (id,))
     servico = cursor.fetchone()
-    
+
     if not servico:
         flash("Serviço não encontrado.", "error")
         return redirect(url_for("admin_servicos"))
-        
+
     return render_template("editar_servico.html", servico=servico)
 
 
@@ -405,22 +436,28 @@ def excluir_servico(id):
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     db = get_db()
     cursor = db.cursor()
-    
+
     # Verificar se o serviço está sendo utilizado em agendamentos
-    cursor.execute("SELECT COUNT(*) FROM agendamentos WHERE servico = (SELECT nome FROM servicos WHERE id = ?)", (id,))
+    cursor.execute(
+        "SELECT COUNT(*) FROM agendamentos WHERE servico = (SELECT nome FROM servicos WHERE id = ?)",
+        (id,),
+    )
     count = cursor.fetchone()[0]
-    
+
     if count > 0:
-        flash(f"Este serviço não pode ser excluído pois está sendo utilizado em {count} agendamento(s).", "error")
+        flash(
+            f"Este serviço não pode ser excluído pois está sendo utilizado em {count} agendamento(s).",
+            "error",
+        )
         return redirect(url_for("admin_servicos"))
-    
+
     # Excluir o serviço
     cursor.execute("DELETE FROM servicos WHERE id = ?", (id,))
     db.commit()
-    
+
     flash("Serviço excluído com sucesso!", "success")
     return redirect(url_for("admin_servicos"))
 
@@ -431,12 +468,12 @@ def excluir_agendamento(id):
     if not current_user.is_admin():
         flash("Você não tem permissão para acessar esta página.", "error")
         return redirect(url_for("home"))
-        
+
     db = get_db()
     cursor = db.cursor()
     cursor.execute("DELETE FROM agendamentos WHERE id = ?", (id,))
     db.commit()
-    
+
     flash("Agendamento excluído com sucesso!", "success")
     return redirect(url_for("admin"))
 
