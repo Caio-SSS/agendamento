@@ -1,19 +1,47 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-    <title>Painel de Administração</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Administração - Michele Nails</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
         body {
-            font-family: Arial, sans-serif;
-            padding: 20px;
             background-color: #f4f4f4;
             color: #333;
+            font-family: Arial, sans-serif;
+            padding: 20px;
         }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        header {
+            background-color: #d9c6e8;
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
         h1 {
             text-align: center;
             margin-bottom: 20px;
-            color: #9F88BF; /* Cor lilás para o título */
+            color: #4a2d4a;
         }
+        
         table {
             width: 100%;
             border-collapse: collapse;
@@ -21,54 +49,198 @@
             background-color: #fff;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
+            padding: 12px;
             text-align: left;
         }
+        
         th {
             background-color: #f2f2f2;
-            color: #A08DA6; /* Cor cinza média para os cabeçalhos */
+            color: #4a2d4a;
+            font-weight: 600;
         }
+        
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        a {
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .btn {
             display: inline-block;
             padding: 10px 15px;
             text-decoration: none;
-            background-color: #F2A7D8; /* Cor rosa claro para o botão voltar */
+            background-color: #9b76b8;
             color: white;
             border-radius: 5px;
             transition: background-color 0.3s ease;
+            font-weight: 500;
+            border: none;
+            cursor: pointer;
         }
-        a:hover {
-            background-color: #F2BDE0; /* Cor rosa claro mais escura no hover */
+        
+        .btn:hover {
+            background-color: #7d5996;
+        }
+        
+        .btn-delete {
+            background-color: #e74c3c;
+        }
+        
+        .btn-delete:hover {
+            background-color: #c0392b;
+        }
+        
+        .btn-back {
+            background-color: #615669;
+        }
+        
+        .btn-back:hover {
+            background-color: #4a4350;
+        }
+        
+        .notification {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            border-left: 4px solid #155724;
+        }
+        
+        .logout-btn {
+            padding: 8px 15px;
+            background-color: #4a2d4a;
+            color: white;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        
+        .logout-btn:hover {
+            background-color: #3a233a;
         }
     </style>
 </head>
 <body>
-    <h1>Agendamentos</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>ID</th>
-                <th>Nome</th>
-                <th>Horário</th>
-                <th>Serviço</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for agendamento in agendamentos %}
-            <tr>
-                <td>{{ agendamento['id'] }}</td>
-                <td>{{ agendamento['nome'] }}</td>
-                <td>{{ agendamento['horario'] }}</td>
-                <td>{{ agendamento['servico'] }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    <a href="/">⬅ Voltar para o início</a>
+    <div class="container">
+        <header>
+            <h1>Painel de Administração - Michele Nails</h1>
+            <a href="/login" class="logout-btn">Sair</a>
+        </header>
+        
+        <div id="message-area"></div>
+        
+        <h2>Agendamentos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Horário</th>
+                    <th>Serviço</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-agendamentos">
+                <!-- Os dados dos agendamentos serão inseridos aqui dinamicamente -->
+            </tbody>
+        </table>
+        
+        <a href="/" class="btn btn-back">Voltar para o início</a>
+    </div>
+
+    <script>
+        // Função para exibir mensagem na área de notificação
+        function mostrarMensagem(texto, tipo = 'sucesso') {
+            const messageArea = document.getElementById('message-area');
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = texto;
+            
+            if (tipo !== 'sucesso') {
+                notification.style.backgroundColor = '#f8d7da';
+                notification.style.color = '#721c24';
+                notification.style.borderLeftColor = '#721c24';
+            }
+            
+            messageArea.innerHTML = '';
+            messageArea.appendChild(notification);
+            
+            // Remover a mensagem após 5 segundos
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
+
+        // Dados de exemplo para agendamentos
+        const agendamentosExemplo = [
+            { id: 1, nome: "Maria Silva", horario: "23/04/2025 09:00", servico: "Manicure Tradicional" },
+            { id: 2, nome: "Ana Oliveira", horario: "23/04/2025 14:30", servico: "Pedicure Tradicional" },
+            { id: 3, nome: "Carla Santos", horario: "24/04/2025 10:00", servico: "Manicure e Pedicure" }
+        ];
+
+        // Função para preencher a tabela com agendamentos
+        function preencherTabela(agendamentos) {
+            const tabela = document.getElementById('tabela-agendamentos');
+            tabela.innerHTML = '';
+            
+            agendamentos.forEach(agendamento => {
+                const tr = document.createElement('tr');
+                
+                tr.innerHTML = `
+                    <td>${agendamento.id}</td>
+                    <td>${agendamento.nome}</td>
+                    <td>${agendamento.horario}</td>
+                    <td>${agendamento.servico}</td>
+                    <td class="actions">
+                        <button class="btn" onclick="editarAgendamento(${agendamento.id})">Editar</button>
+                        <button class="btn btn-delete" onclick="excluirAgendamento(${agendamento.id})">Excluir</button>
+                    </td>
+                `;
+                
+                tabela.appendChild(tr);
+            });
+        }
+
+        // Funções para ações na tabela
+        function editarAgendamento(id) {
+            mostrarMensagem(`Editando agendamento ${id}`);
+            // Implementar lógica de edição
+        }
+
+        function excluirAgendamento(id) {
+            if (confirm(`Deseja realmente excluir o agendamento ${id}?`)) {
+                // Implementar lógica de exclusão
+                mostrarMensagem(`Agendamento ${id} excluído com sucesso!`);
+                
+                // Simulando a atualização da tabela após exclusão
+                const agendamentosFiltrados = agendamentosExemplo.filter(a => a.id !== id);
+                preencherTabela(agendamentosFiltrados);
+            }
+        }
+
+        // Carregar dados na tabela quando a página for carregada
+        document.addEventListener('DOMContentLoaded', function() {
+            preencherTabela(agendamentosExemplo);
+            
+            // Verificar se há uma mensagem de sucesso na URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const mensagem = urlParams.get('mensagem');
+            
+            if (mensagem) {
+                mostrarMensagem(decodeURIComponent(mensagem));
+            }
+        });
+    </script>
+    
+    <a href="/logout" class="logout-btn">Sair</a>
 </body>
 </html>

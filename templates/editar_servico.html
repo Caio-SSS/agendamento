@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Editar Serviço{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+                <div class="card-body p-4">
+                    <div class="text-center mb-4">
+                        <h1 class="fw-bold" style="color: #5A375A;">Editar Serviço</h1>
+                    </div>
+                    
+                    {% if get_flashed_messages() %}
+                    <div class="alert mb-4" style="background-color: #FFD6C9; color: #5A375A; border: none;">
+                        {% for message in get_flashed_messages() %}
+                        {{ message }}
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <form method="post">
+                        <div class="mb-3">
+                            <label for="nome" class="form-label" style="color: #5A375A; font-weight: 500;">Nome do Serviço*</label>
+                            <input type="text" class="form-control" id="nome" name="nome" value="{{ servico.nome }}" required 
+                                  style="border-radius: 8px; border: 1px solid #E5CFFF; padding: 10px;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="descricao" class="form-label" style="color: #5A375A; font-weight: 500;">Descrição</label>
+                            <textarea class="form-control" id="descricao" name="descricao" rows="3"
+                                     style="border-radius: 8px; border: 1px solid #E5CFFF; padding: 10px;">{{ servico.descricao }}</textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="duracao" class="form-label" style="color: #5A375A; font-weight: 500;">Duração (minutos)*</label>
+                            <input type="number" class="form-control" id="duracao" name="duracao" min="1" value="{{ servico.duracao }}" required
+                                  style="border-radius: 8px; border: 1px solid #E5CFFF; padding: 10px;">
+                        </div>
+                        <div class="mb-3">
+                            <label for="preco" class="form-label" style="color: #5A375A; font-weight: 500;">Preço (R$)*</label>
+                            <input type="number" class="form-control" id="preco" name="preco" min="0" step="0.01" value="{{ servico.preco }}" required
+                                  style="border-radius: 8px; border: 1px solid #E5CFFF; padding: 10px;">
+                        </div>
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" class="form-check-input" id="disponivel" name="disponivel" {% if servico.disponivel %}checked{% endif %}
+                                  style="border: 1px solid #E5CFFF;">
+                            <label class="form-check-label" for="disponivel" style="color: #5A375A;">Disponível para Agendamento</label>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn" style="background-color: #9775AA; color: white; border: none; padding: 10px; font-weight: 500;">Salvar Alterações</button>
+                            <a href="{{ url_for('admin_servicos') }}" class="btn" style="background-color: #76667C; color: white; border: none; padding: 10px; font-weight: 500;">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #E5CFFF;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .btn:hover {
+        opacity: 0.9;
+    }
+    
+    .form-control:focus {
+        border-color: #9775AA;
+        box-shadow: 0 0 0 0.25rem rgba(151, 117, 170, 0.25);
+    }
+    
+    .form-check-input:checked {
+        background-color: #9775AA;
+        border-color: #9775AA;
+    }
+</style>
+{% endblock %}

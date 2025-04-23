@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+
+{% block title %}Administração de Serviços{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="text-center mb-4">
+        <h1 class="fw-bold" style="color: #5A375A;">Gerenciamento de Serviços</h1>
+    </div>
+    
+    {% if get_flashed_messages() %}
+    <div class="alert" style="background-color: #FFD6C9; color: #5A375A; border: none;">
+        {% for message in get_flashed_messages() %}
+        {{ message }}
+        {% endfor %}
+    </div>
+    {% endif %}
+    
+    <div class="mb-4 d-flex justify-content-between">
+        <a href="{{ url_for('novo_servico') }}" class="btn" style="background-color: #9775AA; color: white; border: none;">Adicionar Novo Serviço</a>
+        <a href="{{ url_for('admin') }}" class="btn" style="background-color: #76667C; color: white; border: none;">Voltar para Painel</a>
+    </div>
+    
+    <div class="card" style="border-radius: 15px; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <div class="card-body p-4">
+            <table class="table">
+                <thead>
+                    <tr style="border-bottom: 2px solid #E5CFFF;">
+                        <th scope="col" style="color: #5A375A;">ID</th>
+                        <th scope="col" style="color: #5A375A;">Nome</th>
+                        <th scope="col" style="color: #5A375A;">Descrição</th>
+                        <th scope="col" style="color: #5A375A;">Duração (min)</th>
+                        <th scope="col" style="color: #5A375A;">Preço (R$)</th>
+                        <th scope="col" style="color: #5A375A;">Disponível</th>
+                        <th scope="col" style="color: #5A375A;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for servico in servicos %}
+                    <tr style="border-bottom: 1px solid #E5CFFF;">
+                        <td>{{ servico.id }}</td>
+                        <td>{{ servico.nome }}</td>
+                        <td>{{ servico.descricao }}</td>
+                        <td>{{ servico.duracao }}</td>
+                        <td>{{ "%.2f"|format(servico.preco) }}</td>
+                        <td>{{ "Sim" if servico.disponivel else "Não" }}</td>
+                        <td>
+                            <a href="{{ url_for('editar_servico', id=servico.id) }}" class="btn btn-sm me-1" style="background-color: #FFD6C9; color: #5A375A; border: none;">Editar</a>
+                            <a href="{{ url_for('excluir_servico', id=servico.id) }}" class="btn btn-sm" 
+                               style="background-color: #9775AA; color: white; border: none;"
+                               onclick="return confirm('Tem certeza que deseja excluir este serviço?')">Excluir</a>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center" style="color: #76667C;">Nenhum serviço cadastrado.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #E5CFFF;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .btn:hover {
+        opacity: 0.9;
+    }
+    
+    .table {
+        color: #5A375A;
+    }
+</style>
+{% endblock %}
